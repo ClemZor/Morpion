@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+   <head>
+     <link href="morpion.css" rel="stylesheet" type="text/css">
+      
+      <title>Morpion</title>
+   
+     <script language="javascript" type="text/javascript">
+
+
+
+var currentLocation =  document.location.href;
+	currentLocation = currentLocation.substring( 0 ,currentLocation.lastIndexOf( "/" ) );	 
+	 
+
+// Une image
+croix = new Image(60, 60) ;
+croix.src = currentLocation + '/images/croix.png' ; // Préchargement
+
+// Une autre image
+cercle = new Image(60, 60) ;
+cercle.src = currentLocation + '/images/cercle.png' ; // Préchargement
+
+
+
+var etat =1;
+var joueur=2;
+var compteur = 0;
+var timeoutID;
+
+
+
+function verif (a,b,c)
+{
+	return ( document.images[a].src == document.images[b].src && document.images[b].src == document.images[c].src && document.images[a].src!=currentLocation + "/images/vide.png") 
+}
+
+
+function gagnant()
+{
+	return (verif (0,1,2) || verif (3,4,5) || verif(6,7,8) || verif (0,3,6) || verif (1,4,7) || verif (2,5,8) || verif (0,4,8) || verif (2,4,6) )
+}
+
+
+
+function apercu(nb)
+{
+	if (gagnant())
+		return;
+	if (etat < 2 && document.images[nb].src == currentLocation + "/images/vide.png")
+		{
+		if (joueur == 2 )document.getElementById(nb).style.backgroundImage='url(./images/cercle.png)';
+		else document.getElementById(nb).style.backgroundImage='url(./images/croix.png)';
+		}
+}
+
+function reset (nb)
+{
+	if (gagnant())
+		return;
+	if (document.images[nb].src == currentLocation + "/images/vide.png")
+		document.getElementById(nb).style.backgroundImage='url(./images/vide.png)';
+}
+
+
+
+function clignote(image, z, y, x)
+{
+
+	if(etat==1)
+	{
+		if(verif (0,1,2)){z=0; y=1; x=2; image=document.images[z].src;}
+		if(verif (3,4,5)){z=3; y=4; x=5; image=document.images[z].src;}
+		if(verif (6,7,8)){z=6; y=7; x=8; image=document.images[z].src;}
+		if(verif (0,3,6)){z=0; y=3; x=6; image=document.images[z].src;}
+		if(verif (1,4,7)){z=1; y=4; x=7; image=document.images[z].src;}
+		if(verif (2,5,8)){z=2; y=5; x=8; image=document.images[z].src;}
+		if(verif (0,4,8)){z=0; y=4; x=8; image=document.images[z].src;}
+		if(verif (2,4,6)){z=2; y=4; x=6; image=document.images[z].src;}
+	 }
+	
+	if(etat%2)
+	{
+		document.images[z].src = "./images/vide.png";
+		document.getElementById(z).style.backgroundImage='url(./images/vide.png)';
+		document.images[y].src = "./images/vide.png";
+		document.getElementById(y).style.backgroundImage='url(./images/vide.png)';
+		document.images[x].src = "./images/vide.png";
+		document.getElementById(x).style.backgroundImage='url(./images/vide.png)';
+	}
+	else
+	{
+		document.images[z].src = image;
+		document.images[y].src = image;
+		document.images[x].src = image;
+		document.getElementById(z).style.backgroundImage='url(./images/vide.png)';
+		document.getElementById(y).style.backgroundImage='url(./images/vide.png)';
+		document.getElementById(x).style.backgroundImage='url(./images/vide.png)';
+
+	}
+	etat=etat+1;
+
+	if(etat <=50)
+		timeoutID = window.setTimeout("clignote('"+ image +"', "+ z +", "+ y +", "+ x +")",100);
+	else
+		window.clearTimeout(timeoutID);
+		
+		
+}
+
+
+
+
+function alerteWin()
+{
+
+	var joueurWin = gagnant();
+	if(joueurWin != 0)
+	{
+	document.getElementById("winner").innerHTML = 'le joueur ' + joueur + ' a gagné !! ';
+	clignote('./images/vide.png');
+	}
+	else
+		window.alert("Match nul !");
+}
+
+
+
+function morpion (kase)
+{
+if (etat == 1 && !gagnant() && document.images[kase].src == currentLocation + "/images/vide.png"/* ||document.images[kase].src == cercle2.src || document.images[kase].src == croix2.src*/ )
+	{
+	if ( joueur==2)			
+		{
+		document.images[kase].src = cercle.src ;
+		compteur+=1;
+		joueur=1;
+		if (!gagnant())
+			document.getElementById("joueur").innerHTML = 'le joueur actuel est le joueur <img src="' + currentLocation + '/images/croix.png" alt="Joueur2">';
+		}		
+	else
+		{
+		document.images[kase].src = croix.src ;
+		compteur+=1;
+		joueur =2;
+		if(!gagnant())
+			document.getElementById("joueur").innerHTML = 'le joueur actuel est le joueur <img src="' + currentLocation + '/images/cercle.png" alt="Joueur1">';
+		}
+	if(gagnant() || compteur == 9)
+		{
+		alerteWin(joueur);
+		return 0;
+		}
+	}
+}
+
+	  </script>
+	</head>
+
+    <body>
+	<center>
+<!--	<table>
+			<tr>
+			<td id=0><img src="./images/vide.png" alt="pas d'image" onClick="morpion(0)" onMouseOver="apercu(0)" OnMouseOut="reset(0)">
+			<td id=1><img src="./images/vide.png" alt="pas d'image" onClick="morpion(1)" onMouseOver="apercu(1)" OnMouseOut="reset(1)">
+			<td id=2><img src="./images/vide.png" alt="pas d'image" onClick="morpion(2)" onMouseOver="apercu(2)" OnMouseOut="reset(2)">
+			</tr>
+
+			<tr>
+			<td id=3><img src="./images/vide.png" alt="pas d'image" onClick="morpion(3)" onMouseOver="apercu(3)" OnMouseOut="reset(3)">
+			<td id=4><img src="./images/vide.png" alt="pas d'image" onClick="morpion(4)" onMouseOver="apercu(4)" OnMouseOut="reset(4)">
+			<td id=5><img src="./images/vide.png" alt="pas d'image" onClick="morpion(5)" onMouseOver="apercu(5)" OnMouseOut="reset(5)">
+			</tr>
+
+			<tr>
+			<td id=6><img src="./images/vide.png" alt="pas d'image" onClick="morpion(6)" onMouseOver="apercu(6)" OnMouseOut="reset(6)">
+			<td id=7><img src="./images/vide.png" alt="pas d'image" onClick="morpion(7)" onMouseOver="apercu(7)" OnMouseOut="reset(7)">
+			<td id=8><img src="./images/vide.png" alt="pas d'image" onClick="morpion(8)" onMouseOver="apercu(8)" OnMouseOut="reset(8)">
+			</tr>
+	</table>
+	-->
+	
+	
+	
+	<script language="javascript" type="text/javascript">
+	
+	document.write("<table>");
+	for(var i=0;i<3;i++)
+	{
+			document.write("<tr>");
+	
+			for(var j=0;j<3;j++)
+			{
+	
+		
+				document.write("<td id="+(i*3+j)+"><img src=\"./images/vide.png\" alt=\"pas d'image\" onClick=\"morpion("+(i*3+j)+")\" onMouseOver=\"apercu("+(i*3+j)+")\" OnMouseOut=\"reset("+(i*3+j)+")\">");
+
+			
+			}
+	}
+	document.write("</table>");
+	
+	
+	</script>
+	
+	
+<p id="joueur"> le joueur actuel est le joueur <img src="./images/cercle.png" alt="Joueur1"> </p>	
+<p id ="winner"> </p>
+	</center>
+
+	</body>
+</html>
